@@ -1,0 +1,4 @@
+app:
+  pagination:
+    default-size: 10
+    max-size: 50
