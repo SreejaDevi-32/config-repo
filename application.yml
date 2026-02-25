@@ -2,6 +2,9 @@ app:
   pagination:
     default-size: 10
     max-size: 50
+    default-sort:
+      direction: ASC
+      property: createdDate
 
 aes:
   encryption:
