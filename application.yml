@@ -4,7 +4,7 @@ app:
     max-size: 50
     default-sort:
       direction: ASC
-      property: createdDate
+      field: createdDate
 
 aes:
   encryption:
