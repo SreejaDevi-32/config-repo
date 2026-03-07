@@ -1,0 +1,90 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+
+jwt:
+  secret: YWJjZGVmZ2hpamtsbW5vcHFyc3R1dnd4eXoxMjM0NTY3ODkw
+
+
+# -----------------------------------
+# Resilience4j Configuration
+# -----------------------------------
+
+resilience4j:
+
+  circuitbreaker:
+    instances:
+
+      subscriptionServiceCircuitBreaker:
+        slidingWindowType: COUNT_BASED
+        slidingWindowSize: 10
+        minimumNumberOfCalls: 5
+        failureRateThreshold: 50
+        waitDurationInOpenState: 30s
+        permittedNumberOfCallsInHalfOpenState: 3
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+        slowCallDurationThreshold: 3s
+        slowCallRateThreshold: 50
+
+      planServiceCircuitBreaker:
+        slidingWindowType: COUNT_BASED
+        slidingWindowSize: 10
+        minimumNumberOfCalls: 5
+        failureRateThreshold: 50
+        waitDurationInOpenState: 30s
+        permittedNumberOfCallsInHalfOpenState: 3
+
+      userServiceCircuitBreaker:
+        slidingWindowType: COUNT_BASED
+        slidingWindowSize: 10
+        minimumNumberOfCalls: 5
+        failureRateThreshold: 50
+        waitDurationInOpenState: 30s
+        permittedNumberOfCallsInHalfOpenState: 3
+
+      paymentServiceCircuitBreaker:
+        slidingWindowType: COUNT_BASED
+        slidingWindowSize: 10
+        minimumNumberOfCalls: 5
+        failureRateThreshold: 60
+        waitDurationInOpenState: 20s
+
+      notificationServiceCircuitBreaker:
+        slidingWindowType: COUNT_BASED
+        slidingWindowSize: 10
+        minimumNumberOfCalls: 5
+        failureRateThreshold: 70
+        waitDurationInOpenState: 15s
+
+
+  retry:
+    instances:
+
+      subscriptionServiceCircuitBreaker:
+        maxAttempts: 3
+        waitDuration: 2s
+        retryExceptions:
+          - java.io.IOException
+          - java.util.concurrent.TimeoutException
+
+
+  timelimiter:
+    instances:
+
+      subscriptionServiceCircuitBreaker:
+        timeoutDuration: 4s
+
+      planServiceCircuitBreaker:
+        timeoutDuration: 3s
+
+      userServiceCircuitBreaker:
+        timeoutDuration: 3s
+
+      paymentServiceCircuitBreaker:
+        timeoutDuration: 5s
+
+      notificationServiceCircuitBreaker:
+        timeoutDuration: 3s
