@@ -1,0 +1,87 @@
+server:
+  port: 8086
+
+spring:
+  application:
+    name: subscription-service
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/telecom
+    username: root
+    password: Sreeja@123
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    
+  cloud:
+    function:
+      definition: paymentSuccess;paymentFailed
+
+    stream:
+      bindings:
+        subscriptionCreated-out-0:
+          destination: subscription-created
+          content-type: application/json
+
+        rollbackSubscription-in-0:
+          destination: subscription-rollback
+          content-type: application/json
+          
+        paymentSuccess-in-0:
+          destination: payment-success
+          group: subscription-group
+          content-type: application/json
+          
+        paymentFailed-in-0:
+          destination: payment-failed
+          group: subscription-group
+          content-type: application/json
+
+      kafka:
+        binder:
+          brokers: localhost:9092
+      
+resilience4j:
+  circuitbreaker:
+    instances:
+      planService:
+        registerHealthIndicator: true
+        slidingWindowSize: 10
+        minimumNumberOfCalls: 5
+        permittedNumberOfCallsInHalfOpenState: 3
+        waitDurationInOpenState: 30s
+        failureRateThreshold: 50
+        slowCallDurationThreshold: 2s
+        slowCallRateThreshold: 50
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+        
+  retry:
+    instances:
+      planService:
+        maxAttempts: 3
+        waitDuration: 500ms
+        retryExceptions:
+          - java.io.IOException
+          - java.util.concurrent.TimeoutException
+          - org.springframework.web.client.ResourceAccessException
+          
+  timelimiter:
+    instances:
+      planService:
+        timeoutDuration: 2s
+        cancelRunningFuture: true
+        
+  bulkhead:
+    instances:
+      planService:
+        maxConcurrentCalls: 20
+        maxWaitDuration: 500ms
+         
+          
+          
+          
+    
+        
